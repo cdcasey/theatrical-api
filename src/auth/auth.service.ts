@@ -4,6 +4,7 @@ import {
   ConflictException,
   InternalServerErrorException,
   ImATeapotException,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
@@ -47,9 +48,27 @@ export class AuthService {
     }
   }
 
-  signin() {
-    return {
-      msg: 'I am signed in',
-    };
+  async signin(dto: AuthDto) {
+    // find user by email
+    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+
+    // if no user, throw exception
+    if (!user) {
+      throw new ForbiddenException('Incorrect username or password.');
+    }
+
+    // compare password
+    const pwMatches = await argon.verify(user.password, dto.password);
+
+    // if password wrong, throw exception
+    if (!pwMatches) {
+      throw new ForbiddenException('Incorrect username or password.');
+    }
+
+    // return user
+    // quick & dirty temp solution
+    // @ts-ignore
+    delete user.password;
+    return user;
   }
 }
