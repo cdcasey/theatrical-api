@@ -6,14 +6,21 @@ import {
   ImATeapotException,
   NotFoundException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import * as argon from 'argon2';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
-import * as argon from 'argon2';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwt: JwtService,
+    private config: ConfigService,
+  ) {}
 
   async signup(dto: AuthDto) {
     try {
@@ -28,12 +35,7 @@ export class AuthService {
         },
       });
 
-      // quick & dirty temp solution
-      // @ts-ignore
-      delete user.password;
-
-      // return user
-      return user;
+      return this.signToken(user.id, user.email);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -65,10 +67,20 @@ export class AuthService {
       throw new ForbiddenException('Incorrect username or password.');
     }
 
-    // return user
-    // quick & dirty temp solution
-    // @ts-ignore
-    delete user.password;
-    return user;
+    return this.signToken(user.id, user.email);
+  }
+
+  async signToken(userId: string, email: string): Promise<{ access_token: string }> {
+    const payload = {
+      sub: userId,
+      email,
+    };
+    const token = await this.jwt.signAsync(payload, {
+      secret: this.config.get('JWT_SECRET'),
+      expiresIn: '15m',
+    });
+    return {
+      access_token: token,
+    };
   }
 }
