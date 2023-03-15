@@ -1,13 +1,14 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import { User } from '@prisma/client';
+import { GetUser } from 'src/auth/decorator';
+import { JwtGuard } from 'src/auth/guard';
 
+// Putting the guard a the class level means we don't need to put it at each request
+@UseGuards(JwtGuard)
 @Controller('users')
 export class UserController {
-  // jwt is default, but can give any name where strategy is defined.
-  @UseGuards(AuthGuard('jwt'))
   @Get('me')
-  getMe(@Req() req: Request) {
-    return req.user;
+  getMe(@GetUser() user: User) {
+    return user;
   }
 }
