@@ -28,7 +28,7 @@ CREATE TABLE "users" (
 );
 
 -- CreateTable
-CREATE TABLE "bookamrks" (
+CREATE TABLE "bookmarks" (
     "id" SERIAL NOT NULL,
     "url" TEXT NOT NULL,
     "title" TEXT NOT NULL,
@@ -37,11 +37,11 @@ CREATE TABLE "bookamrks" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" INTEGER NOT NULL,
 
-    CONSTRAINT "bookamrks_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "bookmarks_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- AddForeignKey
-ALTER TABLE "bookamrks" ADD CONSTRAINT "bookamrks_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "bookmarks" ADD CONSTRAINT "bookmarks_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

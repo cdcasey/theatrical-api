@@ -34,5 +34,5 @@ model Bookmark {
   // shoul probably have onDelete: Cascade
   user        User     @relation(fields: [userId], references: [id])
 
-  @@map("bookamrks")
+  @@map("bookmarks")
 }
