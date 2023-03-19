@@ -61,17 +61,57 @@ describe('App e2e', () => {
     };
 
     describe('Signup', () => {
+      it('should throw if email empty', async () => {
+        return await pactum
+          .spec()
+          .post('/auth/signup')
+          .withBody({ password: dto.password })
+          .expectStatus(400);
+      });
+
+      it('should throw if password empty', async () => {
+        return await pactum
+          .spec()
+          .post('/auth/signup')
+          .withBody({ password: dto.email })
+          .expectStatus(400);
+      });
+
+      it('should throw if body empty', async () => {
+        return await pactum.spec().post('/auth/signup').expectStatus(400);
+      });
+
       it('should allow a user to sign up', async () => {
         return await pactum.spec().post('/auth/signup').withBody(dto).expectStatus(201);
       });
     });
 
     describe('Signin', () => {
+      it('should throw if email empty', async () => {
+        return await pactum
+          .spec()
+          .post('/auth/signin')
+          .withBody({ password: dto.password })
+          .expectStatus(400);
+      });
+
+      it('should throw if password empty', async () => {
+        return await pactum
+          .spec()
+          .post('/auth/signin')
+          .withBody({ password: dto.email })
+          .expectStatus(400);
+      });
+
+      it('should throw if body empty', async () => {
+        return await pactum.spec().post('/auth/signin').expectStatus(400);
+      });
       it('should allow a user to sign in', async () => {
         return await pactum.spec().post('/auth/signin').withBody(dto).expectStatus(200);
       });
     });
   });
+
   describe('User', () => {
     it.todo('should be able to GET me');
     it.todo('should be able to GET a user');
@@ -79,6 +119,7 @@ describe('App e2e', () => {
     it.todo('should be able to UPDATE a user');
     it.todo('should be able to DELETE a user');
   });
+
   describe('Bookmark', () => {
     it.todo('should be able to GET bookmarks');
     it.todo('should be able to GET a bookmark by id');
