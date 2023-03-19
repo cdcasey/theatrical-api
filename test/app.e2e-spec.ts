@@ -107,24 +107,39 @@ describe('App e2e', () => {
         return await pactum.spec().post('/auth/signin').expectStatus(400);
       });
       it('should allow a user to sign in', async () => {
-        return await pactum.spec().post('/auth/signin').withBody(dto).expectStatus(200);
+        return await pactum
+          .spec()
+          .post('/auth/signin')
+          .withBody(dto)
+          .expectStatus(200)
+          .stores('userAccessToken', 'access_token');
       });
     });
   });
 
   describe('User', () => {
-    it.todo('should be able to GET me');
-    it.todo('should be able to GET a user');
-    it.todo('should be able to CREATE a user');
-    it.todo('should be able to UPDATE a user');
-    it.todo('should be able to DELETE a user');
+    describe('Get Me', () => {
+      it('should be able to GET current user', async () => {
+        return await pactum
+          .spec()
+          .withHeaders({ Authorization: 'Bearer $S{userAccessToken}' })
+          .get('/users/me')
+          .expectStatus(200);
+      });
+    });
+    // it.todo('should be able to GET a user');
+    // it.todo('should be able to CREATE a user');
+    // it.todo('should be able to UPDATE a user');
+    // it.todo('should be able to DELETE a user');
+
+    describe('Edit user', () => {});
   });
 
   describe('Bookmark', () => {
-    it.todo('should be able to GET bookmarks');
-    it.todo('should be able to GET a bookmark by id');
-    it.todo('should be able to CREATE a bookmark');
-    it.todo('should be able to UPDATE a bookmark');
-    it.todo('should be able to DELETE a bookmark');
+    describe('should be able to GET bookmarks', () => {});
+    describe('should be able to GET a bookmark by id', () => {});
+    describe('should be able to CREATE a bookmark', () => {});
+    describe('should be able to UPDATE a bookmark by id', () => {});
+    describe('should be able to DELETE a bookmark by id', () => {});
   });
 });
