@@ -12,5 +12,17 @@ services:
       - 5434:5432
     networks:
       - freecodecamp
+  test-db:
+    image: postgres:13.3
+    container_name: test-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5435:5432
+    networks:
+      - freecodecamp
 networks:
   freecodecamp:

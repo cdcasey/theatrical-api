@@ -14,4 +14,10 @@ export class PrismaService extends PrismaClient {
       },
     });
   }
+
+  // alternative to onDelete: Cascade (?)
+  // teardown logic to run w/ e2e tests
+  cleanDb() {
+    return this.$transaction([this.bookmark.deleteMany(), this.user.deleteMany()]);
+  }
 }
