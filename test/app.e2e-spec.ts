@@ -2,10 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as pactum from 'pactum';
 // import * as request from 'supertest';
+
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { AuthDto } from '../src/auth/dto';
-
+import { EditUserDto } from '../src/user/dto/edit-user.dto';
 // describe('AppController (e2e)', () => {
 //   let app: INestApplication;
 
@@ -127,12 +128,23 @@ describe('App e2e', () => {
           .expectStatus(200);
       });
     });
-    // it.todo('should be able to GET a user');
-    // it.todo('should be able to CREATE a user');
-    // it.todo('should be able to UPDATE a user');
-    // it.todo('should be able to DELETE a user');
 
-    describe('Edit user', () => {});
+    describe('Edit user', () => {
+      it('should be able to EDIT current user', async () => {
+        const dto: EditUserDto = {
+          firstName: 'Test',
+          email: 'notTest@test.com',
+        };
+        return await pactum
+          .spec()
+          .withHeaders({ Authorization: 'Bearer $S{userAccessToken}' })
+          .withBody(dto)
+          .patch('/users')
+          .expectStatus(200)
+          .expectBodyContains(dto.firstName)
+          .expectBodyContains(dto.email);
+      });
+    });
   });
 
   describe('Bookmark', () => {
