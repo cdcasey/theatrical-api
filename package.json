@@ -1,33 +1,94 @@
 {
-  "name": "TheatriCAL",
-  "version": "1.0.0",
-  "description": "Theatre produciton management made easy.",
-  "main": "server.js",
-  "scripts": {
-    "test": "export NODE_ENV='test' && nyc ./node_modules/.bin/mocha -t 5000 --exit",
-    "refresh": "./db/refresh.sh"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cdcasey/theatrical2.git"
-  },
+  "name": "theatrical-api",
+  "version": "0.0.1",
+  "description": "",
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/cdcasey/theatrical2/issues"
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "pretest:e2e": "pnpm db:test:restart",
+    "test:e2e": "dotenv -e .env.test -- jest --config ./test/jest-e2e.json",
+    "pretest:e2e:watch": "pnpm db:test:restart",
+    "test:e2e:watch": "dotenv -e .env.test -- jest --watch --no-cache --config ./test/jest-e2e.json",
+    "prisma:dev:deploy": "pnpm prisma migrate deploy",
+    "db:rm": "docker-compose rm dev-db -s -f -v",
+    "db:up": "docker-compose up dev-db -d --remove-orphans",
+    "db:restart": "pnpm db:rm && pnpm db:up && sleep 1 && pnpm prisma:dev:deploy",
+    "prisma:test:deploy": "dotenv -e .env.test -- pnpm prisma migrate deploy",
+    "db:test:rm": "docker-compose rm test-db -s -f -v",
+    "db:test:up": "docker-compose up test-db -d --remove-orphans",
+    "db:test:restart": "pnpm db:test:rm && pnpm db:test:up && sleep 1 && pnpm prisma:test:deploy"
   },
-  "homepage": "https://github.com/cdcasey/theatrical2#readme",
   "dependencies": {
-    "bcrypt": "^3.0.0",
-    "express": "^4.16.3",
-    "knex": "^0.15.0",
-    "pg": "^7.4.3"
+    "@nestjs/common": "^9.3.12",
+    "@nestjs/config": "^2.3.1",
+    "@nestjs/core": "^9.3.12",
+    "@nestjs/jwt": "^10.0.2",
+    "@nestjs/passport": "^9.0.3",
+    "@nestjs/platform-express": "^9.3.12",
+    "@prisma/client": "^4.11.0",
+    "argon2": "^0.30.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.1",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
-    "mocha": "^5.2.0",
-    "morgan": "^1.9.0",
-    "nyc": "^12.0.2",
-    "supertest": "^3.1.0"
+    "@nestjs/cli": "^9.3.0",
+    "@nestjs/schematics": "^9.0.4",
+    "@nestjs/testing": "^9.3.12",
+    "@types/express": "^4.17.17",
+    "@types/jest": "29.5.0",
+    "@types/node": "18.15.5",
+    "@types/passport-jwt": "^3.0.8",
+    "@types/supertest": "^2.0.12",
+    "@typescript-eslint/eslint-plugin": "^5.56.0",
+    "@typescript-eslint/parser": "^5.56.0",
+    "dotenv-cli": "^7.1.0",
+    "eslint": "^8.36.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jest": "29.5.0",
+    "pactum": "^3.3.2",
+    "prettier": "^2.8.6",
+    "prisma": "^4.11.0",
+    "source-map-support": "^0.5.21",
+    "supertest": "^6.3.3",
+    "ts-jest": "29.0.5",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "4.1.2",
+    "typescript": "^5.0.2",
+    "webpack": "^5.76.3"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
   }
 }
