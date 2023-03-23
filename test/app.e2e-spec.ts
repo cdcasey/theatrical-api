@@ -7,6 +7,7 @@ import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { AuthDto } from '../src/auth/dto';
 import { EditUserDto } from '../src/user/dto/edit-user.dto';
+import { CreateBookmarkDto, EditBookmarkDto } from '../src/bookmark/dto';
 // describe('AppController (e2e)', () => {
 //   let app: INestApplication;
 
@@ -43,12 +44,12 @@ describe('App e2e', () => {
 
     // init just creates the application context, not the server with the API, so we also need listen
     await app.init();
-    await app.listen(3333);
+    await app.listen(3334);
 
     prisma = app.get(PrismaService);
     await prisma.cleanDb();
 
-    pactum.request.setBaseUrl('http://localhost:3333');
+    pactum.request.setBaseUrl('http://localhost:3334');
   });
 
   afterAll(() => {
@@ -148,10 +149,96 @@ describe('App e2e', () => {
   });
 
   describe('Bookmark', () => {
-    describe('should be able to GET bookmarks', () => {});
-    describe('should be able to GET a bookmark by id', () => {});
-    describe('should be able to CREATE a bookmark', () => {});
-    describe('should be able to UPDATE a bookmark by id', () => {});
-    describe('should be able to DELETE a bookmark by id', () => {});
+    describe('GET empty', () => {
+      it('should get empty bookmarks', async () => {
+        return await pactum
+          .spec()
+          .withHeaders({ Authorization: 'Bearer $S{userAccessToken}' })
+          .get('/bookmarks')
+          .expectStatus(200)
+          .expectBody([]);
+      });
+    });
+
+    describe('CREATE', () => {
+      it('should create a bookmark', async () => {
+        const dto: CreateBookmarkDto = {
+          title: 'Test',
+          url: 'http://lame',
+          description: 'REAL LAME',
+        };
+        return await pactum
+          .spec()
+          .withHeaders({ Authorization: 'Bearer $S{userAccessToken}' })
+          .withBody(dto)
+          .post('/bookmarks')
+          .expectStatus(201)
+          .stores('bookmarkId', 'id');
+      });
+    });
+
+    describe('GET bookmarks', () => {
+      it('should get bookmarks', async () => {
+        return await pactum
+          .spec()
+          .withHeaders({ Authorization: 'Bearer $S{userAccessToken}' })
+          .get('/bookmarks')
+          .expectStatus(200)
+          .expectBodyContains('LAME')
+          .expectJsonLength(1);
+      });
+    });
+
+    describe('GET a bookmark by id', () => {
+      it('should get a single bookmark', async () => {
+        return await pactum
+          .spec()
+          .withHeaders({ Authorization: 'Bearer $S{userAccessToken}' })
+          .get('/bookmarks/{id}')
+          .withPathParams('id', '$S{bookmarkId}')
+          .expectStatus(200)
+          .expectBodyContains('LAME')
+          .expectBodyContains('$S{bookmarkId}');
+      });
+    });
+
+    describe('UPDATE', () => {
+      it('should edit a bookmark', async () => {
+        const dto: EditBookmarkDto = {
+          title: 'Final',
+          description: 'Very cool',
+        };
+        return await pactum
+          .spec()
+          .withHeaders({ Authorization: 'Bearer $S{userAccessToken}' })
+          .patch('/bookmarks/{id}')
+          .withPathParams('id', '$S{bookmarkId}')
+          .withBody(dto)
+          .expectStatus(200)
+          .expectBodyContains(dto.title)
+          .expectBodyContains(dto.description);
+      });
+    });
+
+    describe('DELETE', () => {
+      it('should delete a bookmark', async () => {
+        return await pactum
+          .spec()
+          .withHeaders({ Authorization: 'Bearer $S{userAccessToken}' })
+          .delete('/bookmarks/{id}')
+          .withPathParams('id', '$S{bookmarkId}')
+          .expectStatus(204);
+      });
+
+      it('should get empty bookmarks', async () => {
+        return await pactum
+          .spec()
+          .withHeaders({ Authorization: 'Bearer $S{userAccessToken}' })
+          .get('/bookmarks')
+          .expectStatus(200)
+          .expectBody([])
+          .expectJsonLength(0);
+      });
+    });
   });
 });
